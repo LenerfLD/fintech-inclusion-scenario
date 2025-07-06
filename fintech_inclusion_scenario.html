@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Product Design Scenario</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a clean look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0; /* Light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Primary color for highlights */
+        .primary-yellow {
+            background-color: #ffff00;
+        }
+        .text-primary-yellow {
+            color: #ffff00;
+        }
+        .border-primary-yellow {
+            border-color: #ffff00;
+        }
+        /* Custom button styling */
+        .scenario-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .scenario-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .scenario-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        /* Loading spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ffff00;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="scenario-container" class="bg-white p-8 md:p-12 rounded-xl shadow-lg max-w-3xl w-full border-t-8 border-primary-yellow">
+        <h1 id="scenario-title" class="text-3xl md:text-4xl font-bold mb-6 text-center text-gray-800"></h1>
+        <p id="scenario-text" class="text-lg md:text-xl text-gray-700 mb-8 text-center leading-relaxed"></p>
+
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Options will be dynamically loaded here -->
+        </div>
+
+        <div id="llm-features-container" class="mt-8 text-center hidden">
+            <button id="generate-insights-button" class="primary-yellow text-gray-900 font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg scenario-button text-lg">
+                Generate Product Insights ✨
+            </button>
+            <div id="loading-indicator" class="loader hidden"></div>
+            <div id="llm-output" class="mt-6 p-6 bg-gray-50 rounded-lg text-left hidden">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Product Insights</h2>
+                <div id="product-pitch" class="mb-4">
+                    <h3 class="font-semibold text-lg text-gray-700">Product Pitch:</h3>
+                    <p class="text-gray-600"></p>
+                </div>
+                <div id="key-challenge">
+                    <h3 class="font-semibold text-lg text-gray-700">Key Challenge:</h3>
+                    <p class="text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="restart-container" class="mt-8 text-center hidden">
+            <button id="restart-button" class="primary-yellow text-gray-900 font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg scenario-button text-lg">
+                Restart Scenario
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Define the scenario data structure
+        const scenarioData = {
+            "intro": {
+                "title": "Designing a FinTech Product for Financial Inclusion",
+                "text": "Welcome, FinTech Product Designer! Your mission, should you choose to accept it, is to design a groundbreaking financial product that truly serves an underserved community. At our startup, we believe in technology's power to foster financial inclusion. Your decisions will shape the future of countless individuals. Let's begin!",
+                "next": "branch1"
+            },
+            "branch1": {
+                "question": "To whom will your innovative FinTech product cater? Selecting the right target group is crucial for understanding their unique needs and challenges.",
+                "options": [
+                    { "id": "A", "text": "Urban gig workers", "description": "This group often has irregular income, limited access to traditional banking, and a high reliance on digital tools for work. They need flexibility and speed.", "next": "branch2" },
+                    { "id": "B", "text": "Rural families with limited internet", "description": "These communities face significant infrastructure challenges, including poor internet connectivity and limited digital literacy. Trust and accessibility are paramount.", "next": "branch2" },
+                    { "id": "C", "text": "Immigrant communities sending remittances", "description": "This group frequently sends money across borders, often incurring high fees and facing complex processes. They need reliable, affordable, and secure transfer methods.", "next": "branch2" }
+                ]
+            },
+            "branch2": {
+                "question": "Based on your chosen target group, what core feature will be the cornerstone of your FinTech product? This feature should directly address their most pressing financial need.",
+                "options": [
+                    { "id": "A", "text": "Digital wallet with instant access", "description": "A secure and easy-to-use digital wallet allowing immediate access to funds, bill payments, and peer-to-peer transfers. Ideal for daily transactions and liquidity.", "next": "branch3" },
+                    { "id": "B", "text": "Micro-savings + micro-loans", "description": "A combined offering that encourages small, regular savings and provides access to small, flexible loans for emergencies or business growth. Focuses on financial resilience.", "next": "branch3" },
+                    { "id": "C", "text": "Embedded insurance", "description": "Small, affordable insurance products (e.g., health, crop, or income protection) seamlessly integrated into the financial journey, providing a safety net against unforeseen events.", "next": "branch3" }
+                ]
+            },
+            "branch3": {
+                "question": "How will your target users primarily access your FinTech product? The access method must align with their technological capabilities and environmental realities.",
+                "options": [
+                    { "id": "A", "text": "Mobile app", "description": "A feature-rich smartphone application offering a comprehensive user experience. Requires consistent internet access and smartphone ownership.", "next": "branch4" },
+                    { "id": "B", "text": "SMS/USSD", "description": "Leveraging basic feature phones through text-based commands (SMS) or unstructured supplementary service data (USSD). Ideal for low-connectivity areas and basic phones.", "next": "branch4" },
+                    { "id": "C", "text": "Web + agent network", "description": "A web-based platform complemented by a network of local agents who assist users with transactions, onboarding, and support. Blends digital convenience with human touch.", "next": "branch4" }
+                ]
+            },
+            "branch4": {
+                "question": "Every financial inclusion initiative faces unique challenges. Which specific inclusion risk will you prioritize addressing in your product's design and rollout strategy?",
+                "options": [
+                    { "id": "A", "text": "Gender gap", "description": "Designing features and marketing strategies that specifically address barriers faced by women (e.g., lack of ID, social norms, financial literacy) to ensure equitable access and usage.", "end": "Congratulations! By prioritizing the gender gap, you're designing a product that empowers women, fostering greater economic equality. This thoughtful approach enhances the product's impact and reach." },
+                    { "id": "B", "text": "Language/literacy barriers", "description": "Implementing multilingual interfaces, simplified language, visual cues, and audio support to ensure the product is accessible and understandable to users with varying literacy levels or non-dominant languages.", "end": "Excellent choice! Addressing language and literacy barriers ensures your product is truly accessible, breaking down common obstacles to financial participation. Your design promotes widespread understanding and adoption." },
+                    { "id": "C", "text": "Connectivity issues", "description": "Developing an offline-first approach, optimizing for low bandwidth, and ensuring core functionalities work even with intermittent or no internet access. This is crucial for remote or underserved areas.", "end": "Smart move! By tackling connectivity issues head-on, you're ensuring your FinTech product can reach and serve even the most remote populations. This resilience is key to true financial inclusion." }
+                ]
+            }
+        };
+
+        let currentBranchId = "intro"; // Start with the introduction
+        let userSelections = {}; // Store user's choices for LLM input
+
+        // Get DOM elements
+        const scenarioTitle = document.getElementById("scenario-title");
+        const scenarioText = document.getElementById("scenario-text");
+        const optionsContainer = document.getElementById("options-container");
+        const restartContainer = document.getElementById("restart-container");
+        const restartButton = document.getElementById("restart-button");
+        const llmFeaturesContainer = document.getElementById("llm-features-container");
+        const generateInsightsButton = document.getElementById("generate-insights-button");
+        const loadingIndicator = document.getElementById("loading-indicator");
+        const llmOutputDiv = document.getElementById("llm-output");
+        const productPitchParagraph = llmOutputDiv.querySelector("#product-pitch p");
+        const keyChallengeParagraph = llmOutputDiv.querySelector("#key-challenge p");
+
+
+        /**
+         * Renders the current scenario branch (introduction, question, or ending).
+         */
+        function renderScenario() {
+            const currentBranch = scenarioData[currentBranchId];
+
+            // Clear previous content
+            optionsContainer.innerHTML = '';
+            restartContainer.classList.add('hidden');
+            llmFeaturesContainer.classList.add('hidden'); // Hide LLM features until needed
+            llmOutputDiv.classList.add('hidden'); // Hide LLM output
+
+            if (currentBranchId === "intro") {
+                // Display introduction
+                scenarioTitle.textContent = currentBranch.title;
+                scenarioText.textContent = currentBranch.text;
+
+                // Add a "Start" button for the intro
+                const startButton = document.createElement("button");
+                startButton.textContent = "Start Designing";
+                startButton.className = "primary-yellow text-gray-900 font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg scenario-button text-lg w-full md:w-auto mx-auto block";
+                startButton.onclick = () => selectOption(currentBranch.next, null, null); // No selection to store for intro
+                optionsContainer.appendChild(startButton);
+
+            } else if (currentBranch.question) {
+                // Display a question branch
+                scenarioTitle.textContent = currentBranch.question;
+                scenarioText.textContent = ""; // Clear text for questions
+
+                currentBranch.options.forEach(option => {
+                    const buttonContainer = document.createElement("div");
+                    buttonContainer.className = "flex flex-col items-center p-4 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200";
+
+                    const button = document.createElement("button");
+                    button.textContent = `${option.id}. ${option.text}`;
+                    button.className = "primary-yellow text-gray-900 font-semibold py-3 px-6 rounded-full shadow-md hover:shadow-lg scenario-button text-lg w-full mb-2";
+                    // Pass the option text and description to store for LLM
+                    button.onclick = () => selectOption(option.next || option.end, option.text, option.description);
+
+                    const description = document.createElement("p");
+                    description.textContent = option.description;
+                    description.className = "text-sm text-gray-600 text-center mt-2";
+
+                    buttonContainer.appendChild(button);
+                    buttonContainer.appendChild(description);
+                    optionsContainer.appendChild(buttonContainer);
+                });
+
+            } else if (currentBranch.end) {
+                // Display an ending
+                scenarioTitle.textContent = "Scenario Complete!";
+                scenarioText.textContent = currentBranch.end;
+                llmFeaturesContainer.classList.remove('hidden'); // Show LLM features button
+                restartContainer.classList.remove('hidden'); // Show restart button
+            }
+        }
+
+        /**
+         * Handles the selection of an option.
+         * @param {string} nextId - The ID of the next branch or the ending text.
+         * @param {string} selectedText - The text of the chosen option.
+         * @param {string} selectedDescription - The description of the chosen option.
+         */
+        function selectOption(nextId, selectedText, selectedDescription) {
+            // Store the selection if it's not the intro
+            if (currentBranchId !== "intro" && selectedText && selectedDescription) {
+                userSelections[currentBranchId] = { text: selectedText, description: selectedDescription };
+            }
+
+            if (scenarioData[nextId]) {
+                // If it's a valid branch ID, update and render
+                currentBranchId = nextId;
+                renderScenario();
+            } else {
+                // If it's an ending text (from branch4), display it
+                scenarioTitle.textContent = "Scenario Complete!";
+                scenarioText.textContent = nextId; // nextId now contains the ending message
+                optionsContainer.innerHTML = ''; // Clear options
+                llmFeaturesContainer.classList.remove('hidden'); // Show LLM features button
+                restartContainer.classList.remove('hidden'); // Show restart button
+            }
+        }
+
+        /**
+         * Calls the Gemini API to generate product insights based on user selections.
+         */
+        async function generateProductInsights() {
+            loadingIndicator.classList.remove('hidden');
+            llmOutputDiv.classList.add('hidden');
+            generateInsightsButton.disabled = true; // Disable button during loading
+
+            const targetGroup = userSelections.branch1 ? userSelections.branch1.text : "an unspecified target group";
+            const coreFeature = userSelections.branch2 ? userSelections.branch2.text : "an unspecified core feature";
+            const accessMethod = userSelections.branch3 ? userSelections.branch3.text : "an unspecified access method";
+            const inclusionRisk = userSelections.branch4 ? userSelections.branch4.text : "an unspecified inclusion risk";
+
+            const prompt = `The user designed a FinTech product with the following characteristics:
+            - Target Group: ${targetGroup}
+            - Core Feature: ${coreFeature}
+            - Access Method: ${accessMethod}
+            - Prioritized Inclusion Risk: ${inclusionRisk}
+
+            Based on these choices, provide:
+            1. A concise, compelling product pitch (max 2 sentences).
+            2. One significant key challenge this product might face in its implementation or adoption.
+
+            Format your response clearly as:
+            Product Pitch: [Your pitch here]
+            Key Challenge: [Your challenge here]`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Canvas will automatically provide this in runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    // Parse the structured text response
+                    const pitchMatch = text.match(/Product Pitch: (.*)\n/);
+                    const challengeMatch = text.match(/Key Challenge: (.*)/);
+
+                    productPitchParagraph.textContent = pitchMatch ? pitchMatch[1].trim() : "Could not generate pitch.";
+                    keyChallengeParagraph.textContent = challengeMatch ? challengeMatch[1].trim() : "Could not generate challenge.";
+
+                    llmOutputDiv.classList.remove('hidden');
+                } else {
+                    productPitchParagraph.textContent = "Failed to generate insights. Please try again.";
+                    keyChallengeParagraph.textContent = "";
+                    llmOutputDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                productPitchParagraph.textContent = "Error generating insights. Please check console for details.";
+                keyChallengeParagraph.textContent = "";
+                llmOutputDiv.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                generateInsightsButton.disabled = false; // Re-enable button
+            }
+        }
+
+        // Event listener for the restart button
+        restartButton.addEventListener("click", () => {
+            currentBranchId = "intro"; // Reset to introduction
+            userSelections = {}; // Clear selections
+            renderScenario(); // Re-render the scenario
+        });
+
+        // Event listener for the Generate Insights button
+        generateInsightsButton.addEventListener("click", generateProductInsights);
+
+        // Initial render when the page loads
+        window.onload = renderScenario;
+    </script>
+</body>
+</html>
